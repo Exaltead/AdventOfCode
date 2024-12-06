@@ -1,23 +1,23 @@
 ﻿open System.IO
 
-let readContents filename =
-    File.ReadAllLines filename |> Array.map (fun x -> x.ToCharArray())
-
 type Cell =
-    | Empty of visited: bool
+    | Empty
     | Guard
     | Obstacle
 
-let formMap (contents: array<array<char>>) =
+let readMap filename =
     let parseContent input =
         match input with
         | '#' -> Obstacle
         | '^' -> Guard
-        | _ -> Empty false
+        | _ -> Empty
 
-    Array.map (Array.map parseContent) contents
+    File.ReadAllLines filename
+    |> Array.map (fun x -> x.ToCharArray())
+    |> Array.map (Array.map parseContent)
 
-type Dirrection =
+
+type Direction =
     | Left
     | Right
     | Down
@@ -38,20 +38,43 @@ let rotateDirection direction =
     | Right -> Down
     | Down -> Left
 
+type Step =
+    { x: int; y: int; direction: Direction }
 
-let makeGuardTrail (grid: array<array<Cell>>) =
+let rec nextStep grid prevStep =
+    let curX = prevStep.x
+    let curY = prevStep.y
+
+    let (x, y) =
+        match prevStep.direction with
+        | Left -> (curX - 1, curY)
+        | Right -> (curX + 1, curY)
+        | Down -> (curX, curY + 1)
+        | Up -> (curX, curY - 1)
+
+    match getFromGrid grid x y with
+    | Some Guard
+    | Some Empty ->
+        Some(
+            { x = x
+              y = y
+              direction = prevStep.direction }
+        )
+    | Some Obstacle ->
+        nextStep
+            grid
+            { prevStep with
+                direction = rotateDirection prevStep.direction }
+    | _ -> None
+
+let guardStartStep (grid: array<array<Cell>>) =
     let makeIndexes =
         seq {
             for y in 0 .. grid.Length - 1 do
                 for x in 0 .. (grid[0].Length - 1) -> (x, y)
         }
 
-    let isGuard x =
-        match x with
-        | Guard -> true
-        | _ -> false
-
-    let currentPosition =
+    let (x, y) =
         Seq.find
             (fun (x, y) ->
                 match grid[y][x] with
@@ -59,56 +82,52 @@ let makeGuardTrail (grid: array<array<Cell>>) =
                 | _ -> false)
             makeIndexes
 
-    let rec guardNextPosition (curX, curY) direction =
-        let (x, y) =
-            match direction with
-            | Left -> (curX - 1, curY)
-            | Right -> (curX + 1, curY)
-            | Down -> (curX, curY + 1)
-            | Up -> (curX, curY - 1)
+    { x = x; y = y; direction = Up }
 
+let makeGuardTrail (grid: array<array<Cell>>) =
+    let rec simulateGuard takenSteps prevStep =
+        match nextStep grid prevStep with
+        | None -> Some []
+        | Some(step) ->
+            match Set.contains step takenSteps with
+            | true -> None
+            | _ ->
+                let restTrail = simulateGuard (Set.add step takenSteps) step
 
-        match getFromGrid grid x y with
-        | Some(Empty _) -> Some(x, y, direction)
-        | Some Obstacle -> guardNextPosition (curX, curY) (rotateDirection direction)
-        | _ -> None
+                match restTrail with
+                | None -> None
+                | Some x -> Some(step :: x)
 
-    let rec simulateGuard (curX, curY) direction =
-        let moveGuard (nextX, nextY) =
-            Array.set (grid[curY]) curX (Empty(true) )
-            Array.set (grid[nextY]) nextX Guard
+    let startPosition = guardStartStep grid
 
+    (simulateGuard (Set([ startPosition ])) startPosition)
 
-        match guardNextPosition (curX, curY) direction with
-        | None ->
-            Array.set (grid[curY]) curX (Empty(true) )
-            grid
-        | Some(x, y, dir) ->
-            moveGuard (x, y) |> ignore
-            simulateGuard (x, y) dir
+let rec formPotentialLoopMaps originalMap trail =
+    let createModifiedMap (x, y) =
+        let copy = Array.map (fun x -> Array.copy x) originalMap
+        copy[y][x] <- Obstacle
+        copy
 
-    simulateGuard currentPosition Up
+    let guardStartPosition = guardStartStep originalMap
 
-let countVisited = 
-    let convertToNumber cell = 
-        match cell with 
-        | Empty(true) -> 1
-        | _ -> 0
-    Array.map (Array.map convertToNumber >> Array.sum ) >> Array.sum
-let printGrid (grid: array<array<Cell>>) =
-    for y in 0..(grid.Length - 1) do
-        for x in 0..grid[0].Length - 1 do
-            let printChar = 
-                match grid[y][x] with
-                | Guard -> "^"
-                | Obstacle -> "#"
-                | Empty(true) -> "X"
-                | Empty(false) -> "."
-            printf "%s" (printChar)
-        printfn ""
+    trail
+    |> List.map (fun x -> (x.x, x.y))
+    |> List.filter (fun (x, y) -> x <> guardStartPosition.x || y <> guardStartPosition.y)
+    |> Set.ofList
+    |> Set.toList
+    |> List.map (createModifiedMap)
 
-readContents "data.txt" |> formMap 
-|> makeGuardTrail 
-|> countVisited
-|> printfn "Visited cells %d"
-//|> printGrid
+let map = readMap "data.txt"
+let trail = makeGuardTrail map
+
+// Part 1
+trail.Value
+|> List.groupBy (fun x -> (x.x, x.y))
+|> List.length
+|> printfn "Visited cells %d + 1"
+
+// Part 2
+formPotentialLoopMaps map (trail.Value)
+|> List.filter (fun map -> (makeGuardTrail map).IsNone)
+|> List.length
+|> printfn "Potential loop points: %d"
