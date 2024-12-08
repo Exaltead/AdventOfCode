@@ -31,3 +31,6 @@ Custom sorting systems, fairly straight forward part 1 but unclear part 2. Would
 
 ### Day 6
 Part 1 was fairly clear trail tracking exercise but part2 was actually fun. Had to think for a bit and optimize a few times. One issue was that the test input did not cover most of the pitfalls, so had to just guess/deduce what the issue might be.
+
+### Day7
+Was nice and refreshing especially simple
