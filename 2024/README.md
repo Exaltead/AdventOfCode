@@ -34,3 +34,6 @@ Part 1 was fairly clear trail tracking exercise but part2 was actually fun. Had 
 
 ### Day7
 Was nice and refreshing especially simple
+
+### Day8
+Looked far more annoying than it actually was.
