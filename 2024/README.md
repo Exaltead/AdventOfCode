@@ -37,3 +37,6 @@ Was nice and refreshing especially simple
 
 ### Day8
 Looked far more annoying than it actually was.
+
+### Day9
+Was way more work than I anticipated, part 1 was straightforward. Part 2 was straightforward but a lot of work. Had couple indexing issues, but even suboptimal solution seemed to work.
