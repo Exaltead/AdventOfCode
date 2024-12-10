@@ -40,3 +40,7 @@ Looked far more annoying than it actually was.
 
 ### Day9
 Was way more work than I anticipated, part 1 was straightforward. Part 2 was straightforward but a lot of work. Had couple indexing issues, but even suboptimal solution seemed to work.
+
+## Day10
+
+Accidentally implemented part 2 first. Was nice and clean puzzle
