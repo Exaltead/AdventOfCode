@@ -48,3 +48,6 @@ Accidentally implemented part 2 first. Was nice and clean puzzle
 ### Day11
 
 Great puzzle, part 1 was straightforward and part2 really tested the scalability of the solution.
+
+### Day 12
+Part 1 was fun and smooth, for me part 2 was a lot of work. I have the right idea from the start but spent a few hours just debugging
