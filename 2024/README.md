@@ -51,3 +51,6 @@ Great puzzle, part 1 was straightforward and part2 really tested the scalability
 
 ### Day 12
 Part 1 was fun and smooth, for me part 2 was a lot of work. I have the right idea from the start but spent a few hours just debugging
+
+### Day 13
+The solution is embarrassingly simple, junior high level math. Only twist was having to use external library for representing fractions of the size accurately. Possible could have worked with doubles bit didn't test.
