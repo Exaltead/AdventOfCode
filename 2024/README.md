@@ -54,3 +54,6 @@ Part 1 was fun and smooth, for me part 2 was a lot of work. I have the right ide
 
 ### Day 13
 The solution is embarrassingly simple, junior high level math. Only twist was having to use external library for representing fractions of the size accurately. Possible could have worked with doubles bit didn't test.
+
+### Day 14
+Spent way too much time with part 1 due to indexing issue. Had to look up some one elses solution as it worked by accident for the test case. Part2 was tempting to try manually but writing efficient heuristic for tree search was the key.
